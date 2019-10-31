@@ -1,13 +1,22 @@
 import { ADD_MESSAGE_ACTION } from '../action/action';
 
 export const addMessage = (message, username) => {
-  let connection = new WebSocket('ws://127.0.0.1:8080');
-console.log(message);
-  connection.onopen = () => connection.send(JSON.parse(message));
+  let connection = new WebSocket('wss://srrj6.sse.codesandbox.io/');
+//console.log(message);
+  const  obj = {
+    "type" : "ADD_MESSAGE",
+    "username" : username,
+    "message" : message
+  }
+  console.log(obj);
+  let msg = JSON.stringify(obj)
+  console.log(msg);
+
+  connection.onopen = () => connection.send(msg);
 
   connection.onmessage = function (message) {
     try {
-      var message = JSON.parse(message.data);
+      var message = (message.data);
     } catch (e) {
       console.log('This doesn\'t look like a valid JSON: ',
           message.data);

@@ -1,31 +1,33 @@
-import React, { Component, Fragment } from "react";
-import MessageItem from "./MessageItem";
-import Emoji from 'react-emoji-render';
+import React from 'react';
+import MessageItem from './MessageItem';
+import { connect } from 'react-redux';
+//import Emoji from 'react-emoji-render';
 
-class MessageList extends Component {
-  render() {
-    const dontMessage = this.props.messages.length > 0;
-
-    const list = { 
-      borderColor: "grey",
-      padding: 10,
-      listStyle: "none" 
-    }
-
-    return (
-      <Fragment>
-        <ul style={list}>
-          {this.props.messages.length > 0 &&
-            this.props.messages.map((message, i) => {
-              return (
-                <MessageItem handleOnClick={this.handleOnClick} key={i} message={message} />
-              );
-            })}
-        </ul>
-        {!dontMessage && <p>Aucun message <Emoji text=" ;( " /></p>}
-      </Fragment>
-    );
-  }
+const list = { 
+  borderColor: "grey",
+  padding: 10,
+  listStyle: "none" 
 }
 
-export default MessageList;
+const MessageList = ({ messages }) => {
+  return (
+    <ul style={{ list }}>
+      {messages.map((message, x) => {
+        return <MessageItem key={x} index={x} message={message} />;
+      })}
+      <div>{messages.length === 0 && <p>Aucun message </p>}</div>
+    </ul>
+  );
+};
+
+const stateToProps = state => {
+  return {
+    messages: state.message.messages,
+  };
+};
+
+const connectComponent = connect(stateToProps);
+
+export default connectComponent(MessageList);
+
+

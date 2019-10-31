@@ -1,10 +1,10 @@
-import React, { PureComponent } from "react";
-import PropTypes from "prop-types";
-import Emoji from 'react-emoji-render';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { addMessage } from './../action/message';
+//import Emoji from 'react-emoji-render';
 
 const display = { 
-  padding: 10,
-  display: "flex"
+  padding: 10
 };
 
 const button = {
@@ -21,45 +21,52 @@ const input = {
   borderRadius: 5
 };
 
+const username = prompt("nom d'utilisateur");
 
-class MessageBar extends PureComponent {
+class MessageBar extends Component {
+  constructor(props) {
+    super(props);
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.state = { message: '' };
+  }
 
-  state = {username: "", message: "", hasError: false };
+  handleChange(value) {
+    this.setState({ message: value.target.value });
+  }
 
-  handleOnChange = handle => {
-    this.setState({ [handle.target.id]: handle.target.value, hasError: false });
-  };
-
-  handleOnSubmit = handle => {
-    handle.preventDefault();
-
-    if (this.state.message.length > 150){
-      this.setState({ lengthError: true });
+  handleSubmit(value) {
+    value.preventDefault();
+    if (this.state.message !== '') {
+      this.props.onAddMessage( username, this.state.message);
+      this.setState({ message: '' });
     }
-    else if (this.state.message) {
-      this.setState({ message: "" });
-      this.props.handleOnSubmit(this.state.message);
-    } else {
-      this.setState({ hasError: true });
-    }
-  };
+  }
 
   render() {
     return (
-      <div style={display}>
-        <form onSubmit={this.handleOnSubmit}>
-          <input id="message" onChange={this.handleOnChange} value={this.state.message} placeholder="Votre message" type="text" style={input} />
-          <button style={button} type="submit" >Envoyer</button>
-          {this.state.lengthError && <p>pas plus de 150 caractères <Emoji text=" :rage: " /></p>}
-          {this.state.hasError && <p>renseigner un message <Emoji text=" :rage: " /></p>}
-        </form>
-      </div>
+      <form onSubmit={this.handleSubmit} style={{display}}>
+        <input onChange={this.handleChange} value={this.state.message} placeholder="Votre message" type="text" style={input}/>
+        <button type="submit" style={button}>Envoyer</button>
+      </form>
     );
   }
 }
 
-MessageBar.propTypes = {
-  handleOnSubmit: PropTypes.func.isRequired
+const dispatchToProps = dispatch => {
+  return {
+    onAddMessage: (username, message) => {
+      dispatch(addMessage(message, username));
+    },
+  };
 };
 
-export default MessageBar;
+const connectComponent = connect(null, dispatchToProps);
+
+export default connectComponent(MessageBar);
+
+
+
+
+
+
